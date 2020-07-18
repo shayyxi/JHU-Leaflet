@@ -1,0 +1,102 @@
+---
+title: "MyMap"
+author: "Shazi"
+date: "7/18/2020"
+output: 
+  html_document:
+    keep_md: true
+---
+
+# Leaflet Package Utilization
+
+In this project, I am practising the leaflet package. I will be utilising different functions from the package.
+
+## Simple Map
+The following code is calling the leaflet library and generating a simple map. On this simple map, we can build further more.
+
+
+```{r message=FALSE}
+library(leaflet)
+myMap<-leaflet()
+myMap<-addTiles(myMap)
+myMap
+```
+
+## Adding some details
+This is the map showing two markers. One marker is over my dormitory and other one is over the super store I frequently visit. The map is interactive and you can hover, zoom in/out over it.  
+
+```{r message=FALSE}
+df<-data.frame(name=c("My Dormitory","My Super Store"),lat=c(47.526225,47.526980),lng=c(19.084538,19.083020))
+df %>%
+  leaflet() %>%
+  addTiles() %>%
+  addMarkers(popup=df$name) 
+```
+
+## Adding custom icons
+
+Now we will add custom icon in our markers to make the map look more user-friendly. In the map produced by the following code, there will be a popup logo on my university. 
+
+```{r}
+customIcon<-makeIcon(
+  iconUrl="https://upload.wikimedia.org/wikipedia/en/a/af/ELTE_logo.png",
+  iconWidth=38*215/230,iconHeight=39,
+  iconAnchorX=31*215/230/2, iconAnchorY=16
+)
+Location<-data.frame(name="ELTE(My University)",lat=47.47047,lng=19.05987)
+
+pop="<a href='https://www.elte.hu/'>ELTE University</a>"
+
+Location %>%
+  leaflet() %>%
+  addTiles() %>%
+  addMarkers(icon=customIcon,popup=pop)
+```
+
+## Clustering Marker
+
+The following code will draw markers on the map and cluster them. Since there are so many markers so it is not feasible to keep every marker feasible as it will cause cluttering on the map. So by enabling the clustrering options, markers will be clustered and they can be opened by zooming in. 
+
+```{r}
+Map<-data.frame(lat=runif(300,min=47.5,max=48.1),lng=runif(300,min=19.05,max=19.20))
+
+Map %>%
+  leaflet() %>%
+  addTiles() %>%
+  addMarkers(clusterOptions=markerClusterOptions())
+```
+
+## Adding Circles
+
+We can also put circles over the maps if needed. The following code will be putting circles over the map corresponding to the population of the place. 
+
+```{r message=FALSE}
+citiesData<-data.frame(name = c("Baltimore", "Frederick", "Rockville", "Gaithersburg", 
+                                 "Bowie", "Hagerstown", "Annapolis", "College Park", "Salisbury", "Laurel"),
+                        pop = c(619493, 66169, 62334, 61045, 55232,
+                                39890, 38880, 30587, 30484, 25346),
+                        lat = c(39.2920592, 39.4143921, 39.0840, 39.1434, 39.0068, 39.6418, 38.9784, 38.9897, 38.3607, 39.0993),
+                        lng = c(-76.6077852, -77.4204875, -77.1528, -77.2014, -76.7791, -77.7200, -76.4922, -76.9378, -75.5994, -76.8483))
+
+citiesData %>%
+  leaflet() %>%
+  addTiles() %>%
+  addCircles(weight=1,radius=sqrt(citiesData$pop)*30)
+
+```
+
+## Legends
+We can put legends on the map as well for classification or differentiation purposes. The following code will put circles on the map and will classify the circles with color and put a legend as well. 
+
+```{r message=FALSE}
+Map<-data.frame(lat=runif(25,min=47.5,max=48.1),
+                lng=runif(25,min=19.05,max=19.20),
+                colr=sample(c('Yellow','Red','Black'),25,replace=TRUE))
+
+
+Map %>%
+  leaflet() %>%
+  addTiles() %>%
+  addCircles(color=Map$colr,radius=1500) %>%
+  addLegend(labels=LETTERS[1:3],colors=c('Yellow','Red','Black'))
+```
